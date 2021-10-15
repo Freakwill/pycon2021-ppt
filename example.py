@@ -1,11 +1,30 @@
+
+"""A good example to write PEG by pyparsing
+"""
+
 import pyparsing as pp
 
 """PEG:
-L0 = identifier | ( L3 )
-L1 = -? L0
-L2 = L1 ((*|/)L1)*
-L3 = L2 ((+|-)L2)*
+L0 = <identifier> | ( L3 )
+L1 = '-'? L0
+L2 = L1 (('*'|'/')L1)*
+L3 = L2 (('+'|'-')L2)*
+
+Example: a+((b+c)*t*(k*g)+d)
 """
+
+class basic_code:
+    # basic code for PEG
+    L3 = pp.Forward()
+    L0 = pp.pyparsing_common.identifier | pp.Suppress('(') + L3 + pp.Suppress(')')
+    L1 = pp.Optional('-') + L0
+    L2 = pp.delimitedList(L1, pp.oneOf(('*','/')))
+    L2.setParseAction(MultiplyAction)
+    L3 <<= pp.delimitedList(L2, pp.oneOf(('+', '-')))
+    L3.setParseAction(PlusAction)
+
+    result = L3.parseString('a+((b+c)*t*(k*g)+d)')
+
 
 class Action:
     terms = []
@@ -65,7 +84,7 @@ class PlusAction(Action):
 
 L3 = pp.Forward()
 L0 = pp.pyparsing_common.identifier('identifier') | pp.Suppress('(') + L3('block') + pp.Suppress(')')
-L1 = pp.Optional('-') + L0
+L1 = pp.Combine(pp.Optional('-') + L0)
 L2 = pp.delimitedList(L1, pp.oneOf(('*','/'))('op'))
 L2.setParseAction(MultiplyAction)
 L3 <<= pp.delimitedList(L2, pp.oneOf(('+', '-'))('op'))
