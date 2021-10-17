@@ -4,6 +4,8 @@ module Peg
 )
 where
 
+import Data.Monoid
+import Data.Semigroup
 import StringOp
 
 
@@ -18,7 +20,7 @@ class Parser a where
     parse :: a -> String -> (ParseResults, String)
     parse a s = parseImpl a (preprocess s)
 
-instance Monoid ParseExpression where
+instance Semigroup ParseExpression where
     pe <> pe1 = Add [pe, pe1]
 
 instance Parser ParseExpression where
