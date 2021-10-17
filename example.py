@@ -10,7 +10,7 @@ L1 = '-'? L0
 L2 = L1 (('*'|'/')L1)*
 L3 = L2 (('+'|'-')L2)*
 
-Example: a+((b+c)*t*(k*g)+d)
+Example: (a+b) * (c+d)+f
 """
 
 class basic_code:
@@ -19,11 +19,19 @@ class basic_code:
     L0 = pp.pyparsing_common.identifier | pp.Suppress('(') + L3 + pp.Suppress(')')
     L1 = pp.Optional('-') + L0
     L2 = pp.delimitedList(L1, pp.oneOf(('*','/')))
-    L2.setParseAction(MultiplyAction)
     L3 <<= pp.delimitedList(L2, pp.oneOf(('+', '-')))
-    L3.setParseAction(PlusAction)
 
-    result = L3.parseString('a+((b+c)*t*(k*g)+d)')
+    result = L3.parseString('(a+b) * (c+d)')
+
+
+class unwork_code:
+    # code as CFG, but does not work
+    S = pp.pyparsing_common.identifier | pp.Suppress('(') + S + pp.Suppress(')')
+    S = pp.Optional('-') + S
+    S = S + pp.oneOf(('*','/')) + S
+    S = S + pp.oneOf(('+','-')) + S
+
+    result = S.parseString('(a+b) * (c+d)')
 
 
 class Action:
