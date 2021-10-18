@@ -4,7 +4,7 @@ module Peg
 )
 where
 
-import Data.Monoid
+import Control.Monad.State.Lazy
 import Data.Semigroup
 import StringOp
 
